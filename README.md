@@ -1,4 +1,4 @@
-# 🔄 SwapSkill https://swapskill-com-1.onrender.com
+# 🔄 SwapSkill
 A skill-sharing web platform built with the MERN stack where students can connect with others to **learn and teach** different skills. Users can request to learn/teach, accept requests, and chat — fully responsive and user-friendly.
 
 ## 🚀 Features
