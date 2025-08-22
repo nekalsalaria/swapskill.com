@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/user/all")
+      .get("https://swapskill-com.onrender.com/api/user/all")
       .then((res) => {
         const allUsers = res.data;
         const sorted = allUsers.sort((a, b) => {
@@ -49,7 +49,7 @@ const Dashboard = () => {
   const sendRequest = async (toUserId, skill, type) => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/user/request",
+        "https://swapskill-com.onrender.com/api/user/request",
         { toUserId, skill, type },
         {
           headers: {
