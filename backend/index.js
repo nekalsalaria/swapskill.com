@@ -11,10 +11,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS for local frontend
+// ✅ Update CORS to allow live frontend
 app.use(
   cors({
-    origin: "http://localhost:5173", // local React frontend
+    origin: [
+      "http://localhost:5173",               // local development
+      "https://swapskill-com-1.onrender.com", // live frontend
+    ],
     credentials: true,
   })
 );
@@ -27,15 +30,15 @@ app.use("/api/user", userRoutes);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("✅ API is running on localhost!");
+  res.send("✅ API is running on Render!");
 });
 
-// MongoDB connection without deprecated options
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB");
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err.message);
