@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const discussionRoutes = require("./routes/discussion");
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-
+app.use("/api/discussion", discussionRoutes);
 // Default route
 app.get("/", (req, res) => {
   res.send("✅ API is running on Render!");

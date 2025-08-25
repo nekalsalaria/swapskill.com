@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FaExchangeAlt, FaSearch, FaLinkedin } from "react-icons/fa";
+import {
+  FaExchangeAlt,
+  FaSearch,
+  FaLinkedin,
+  FaPlus,
+  FaTimes,
+  FaPaperPlane,
+  FaComments
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/profile.jpg";
 import { useSelector } from "react-redux";
@@ -17,9 +25,14 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Chat states
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+
   useEffect(() => {
     axios
-      .get("https://swapskill-com.onrender.com/api/user/all")
+      .get("http://localhost:5000/api/user/all")
       .then((res) => {
         const allUsers = res.data;
         const sorted = allUsers.sort((a, b) => {
@@ -33,6 +46,38 @@ const Dashboard = () => {
       .catch((err) => console.error("Failed to fetch users", err))
       .finally(() => setLoading(false));
   }, [loggedInUser]);
+
+  // Fetch chat messages
+  useEffect(() => {
+    if (isChatOpen) {
+      fetchMessages();
+      const interval = setInterval(fetchMessages, 5000); // Poll every 5s
+      return () => clearInterval(interval);
+    }
+  }, [isChatOpen]);
+
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/discussion");
+      setMessages(res.data);
+    } catch (error) {
+      console.error("Failed to fetch messages", error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
+    try {
+      const res = await axios.post("http://localhost:5000/api/discussion", {
+        user: loggedInUser.name,
+        message: newMessage,
+      });
+      setMessages((prev) => [...prev, res.data]);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send message", error);
+    }
+  };
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -48,8 +93,8 @@ const Dashboard = () => {
 
   const sendRequest = async (toUserId, skill, type) => {
     try {
-      const res = await axios.post(
-        "https://swapskill-com.onrender.com/api/user/request",
+      await axios.post(
+        "http://localhost:5000/api/user/request",
         { toUserId, skill, type },
         {
           headers: {
@@ -57,12 +102,10 @@ const Dashboard = () => {
           },
         }
       );
-
       toast.success("Request sent successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
-
       const updateFn = (prev) =>
         prev.map((u) =>
           u._id === toUserId
@@ -70,33 +113,24 @@ const Dashboard = () => {
                 ...u,
                 requests: [
                   ...(u.requests || []),
-                  {
-                    from: loggedInUser._id,
-                    skill,
-                    type,
-                  },
+                  { from: loggedInUser._id, skill, type },
                 ],
               }
             : u
         );
-
       setUsers(updateFn);
       setFilteredUsers(updateFn);
     } catch (err) {
       console.error("Request failed", err);
-      const msg =
-        err?.response?.data?.error || "❌ Failed to send request.";
-      toast.error(msg, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      const msg = err?.response?.data?.error || "❌ Failed to send request.";
+      toast.error(msg, { position: "top-right", autoClose: 3000 });
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-200 via-pink-100 to-yellow-100 font-sans">
       <ToastContainer />
-      
+
       {/* Navbar */}
       <div className="flex justify-between items-center px-4 sm:px-6 py-4 bg-white shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2 text-blue-600 font-bold text-xl sm:text-2xl">
@@ -174,15 +208,7 @@ const Dashboard = () => {
                           (r) =>
                             r.from === loggedInUser._id && r.type === "learn"
                         ) ? (
-                          <button
-                            className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed"
-                            onClick={() =>
-                              toast.info("Already sent a 'Request to Learn'.", {
-                                position: "top-right",
-                                autoClose: 3000,
-                              })
-                            }
-                          >
+                          <button className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
                             Pending...
                           </button>
                         ) : (
@@ -205,15 +231,7 @@ const Dashboard = () => {
                           (r) =>
                             r.from === loggedInUser._id && r.type === "teach"
                         ) ? (
-                          <button
-                            className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed"
-                            onClick={() =>
-                              toast.info("Already sent an 'Offer to Teach'.", {
-                                position: "top-right",
-                                autoClose: 3000,
-                              })
-                            }
-                          >
+                          <button className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
                             Pending...
                           </button>
                         ) : (
@@ -240,6 +258,62 @@ const Dashboard = () => {
         </section>
       </main>
 
+      {/* Floating Chat Button */}
+      <button
+        onClick={() => setIsChatOpen(true)}
+        className="fixed bottom-8 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition"
+      >
+        <FaComments size={20} />
+      </button>
+
+      {/* Chat Modal */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg w-96 h-[500px] shadow-xl flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold">Community Chat</h3>
+              <FaTimes
+                className="cursor-pointer text-gray-500 hover:text-gray-700"
+                onClick={() => setIsChatOpen(false)}
+              />
+            </div>
+            <div className="flex-1 p-4 overflow-y-auto space-y-3">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`p-2 rounded-lg ${
+                    msg.user === loggedInUser.name
+                      ? "bg-pink-100 text-right"
+                      : "bg-gray-100 text-left"
+                  }`}
+                >
+                  <p className="text-sm font-bold">{msg.user}</p>
+                  <p className="text-sm">{msg.message}</p>
+                  <span className="text-xs text-gray-400">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 border p-2 rounded"
+              />
+              <button
+                onClick={sendMessage}
+                className="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded"
+              >
+                <FaPaperPlane />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="w-full bg-gray-900 text-white py-6 px-6 text-sm sm:text-base mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center">
@@ -257,7 +331,6 @@ const Dashboard = () => {
               </a>
             </span>
           </div>
-
           <div className="text-center sm:text-right">
             <p>Any Suggestions?</p>
             <a
