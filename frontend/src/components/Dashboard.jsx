@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/user/all")
+      .get("https://swapskill-com.onrender.com/api/user/all")
       .then((res) => {
         const allUsers = res.data;
         const sorted = allUsers.sort((a, b) => {
@@ -58,7 +58,7 @@ const Dashboard = () => {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/discussion");
+      const res = await axios.get("https://swapskill-com.onrender.com/api/discussion");
       setMessages(res.data);
     } catch (error) {
       console.error("Failed to fetch messages", error);
@@ -68,7 +68,7 @@ const Dashboard = () => {
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
     try {
-      const res = await axios.post("http://localhost:5000/api/discussion", {
+      const res = await axios.post("https://swapskill-com.onrender.com/api/discussion", {
         user: loggedInUser.name,
         message: newMessage,
       });
@@ -94,7 +94,7 @@ const Dashboard = () => {
   const sendRequest = async (toUserId, skill, type) => {
     try {
       await axios.post(
-        "http://localhost:5000/api/user/request",
+        "https://swapskill-com.onrender.com/api/user/request",
         { toUserId, skill, type },
         {
           headers: {
