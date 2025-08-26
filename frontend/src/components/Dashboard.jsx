@@ -3,10 +3,10 @@ import {
   FaExchangeAlt,
   FaSearch,
   FaLinkedin,
-  FaPlus,
   FaTimes,
   FaPaperPlane,
-  FaComments
+  FaComments,
+  FaRegStar
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/profile.jpg";
@@ -25,10 +25,11 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Chat states
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     axios
@@ -47,11 +48,10 @@ const Dashboard = () => {
       .finally(() => setLoading(false));
   }, [loggedInUser]);
 
-  // Fetch chat messages
   useEffect(() => {
     if (isChatOpen) {
       fetchMessages();
-      const interval = setInterval(fetchMessages, 5000); // Poll every 5s
+      const interval = setInterval(fetchMessages, 5000);
       return () => clearInterval(interval);
     }
   }, [isChatOpen]);
@@ -193,6 +193,7 @@ const Dashboard = () => {
                         <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
                     </div>
+
                     <p className="text-sm">
                       <strong>Knows:</strong> {user.canTeach || "Not specified"}
                     </p>
@@ -201,12 +202,25 @@ const Dashboard = () => {
                       {user.wantToLearn || "Not specified"}
                     </p>
 
+                    {/* Rating UI */}
+                    <div className="flex items-center gap-1 mt-3">
+                      {[...Array(5)].map((_, index) => (
+                        <FaRegStar key={index} className="text-yellow-400" />
+                      ))}
+                      <span className="text-sm text-gray-500 ml-2">(0 reviews)</span>
+                    </div>
+
+                    <button
+                      onClick={() => setShowPopup(true)}
+                      className="mt-2 w-full bg-yellow-500 text-white py-2 rounded-lg shadow hover:bg-yellow-600 transition"
+                    >
+                      Rate Mentor
+                    </button>
+
                     {user._id !== loggedInUser._id && (
                       <div className="mt-4 flex flex-wrap gap-3">
-                        {/* Request to Learn */}
                         {user.requests?.some(
-                          (r) =>
-                            r.from === loggedInUser._id && r.type === "learn"
+                          (r) => r.from === loggedInUser._id && r.type === "learn"
                         ) ? (
                           <button className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
                             Pending...
@@ -214,11 +228,7 @@ const Dashboard = () => {
                         ) : (
                           <button
                             onClick={() =>
-                              sendRequest(
-                                user._id,
-                                user.canTeach || "Skill",
-                                "learn"
-                              )
+                              sendRequest(user._id, user.canTeach || "Skill", "learn")
                             }
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
                           >
@@ -226,10 +236,8 @@ const Dashboard = () => {
                           </button>
                         )}
 
-                        {/* Offer to Teach */}
                         {user.requests?.some(
-                          (r) =>
-                            r.from === loggedInUser._id && r.type === "teach"
+                          (r) => r.from === loggedInUser._id && r.type === "teach"
                         ) ? (
                           <button className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
                             Pending...
@@ -237,11 +245,7 @@ const Dashboard = () => {
                         ) : (
                           <button
                             onClick={() =>
-                              sendRequest(
-                                user._id,
-                                user.wantToLearn || "Skill",
-                                "teach"
-                              )
+                              sendRequest(user._id, user.wantToLearn || "Skill", "teach")
                             }
                             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
                           >
@@ -257,6 +261,25 @@ const Dashboard = () => {
           )}
         </section>
       </main>
+
+      {/* Rating Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
+            <h3 className="text-lg font-semibold mb-4">Action Required</h3>
+            <p className="text-gray-600 mb-6">
+              First you have to learn something from this mentor. Click on{" "}
+              <strong>Request to Learn</strong> to proceed.
+            </p>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition"
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Floating Chat Button */}
       <button

@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  ratings: {
+    average: { type: Number, default: 0 }, // e.g., 4.5
+    totalReviews: { type: Number, default: 0 } // e.g., 10
+  },
   requests: [requestSchema],
   acceptedRequests: [requestSchema],
   chat: [chatSchema], // ✅ New chat field added
