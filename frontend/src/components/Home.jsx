@@ -22,6 +22,10 @@ const Home = () => {
     setShowPopup(false);
   };
 
+  const goToSignup = () => {
+    navigate("/signup");
+  };
+
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-pink-200 via-pink-100 to-yellow-100 font-sans text-gray-900 transition duration-300">
       {/* Navbar */}
@@ -127,8 +131,8 @@ const Home = () => {
                 <strong>Priya</strong>.
               </li>
               <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>Nimish</strong> teaches Java to <strong>Ali</strong>, who
-                helps her with Python basics.
+                <strong>Nimish</strong> teaches Java to <strong>Ali</strong>,
+                who helps her with Python basics.
               </li>
               <li className="bg-white rounded-lg p-3 shadow-sm">
                 <strong>Ajay</strong> helps <strong>Ram</strong> with Figma, and
@@ -173,8 +177,12 @@ const Home = () => {
                 <p className="text-sm text-gray-500">Student</p>
               </div>
             </div>
-            <p><strong>Knows:</strong> Data Structures, Java</p>
-            <p><strong>Wants to Learn:</strong> UI/UX, JavaScript</p>
+            <p>
+              <strong>Knows:</strong> Data Structures, Java
+            </p>
+            <p>
+              <strong>Wants to Learn:</strong> UI/UX, JavaScript
+            </p>
             <div className="mt-4 flex gap-3 flex-wrap">
               <button
                 onClick={handleFeatureClick}
@@ -204,8 +212,12 @@ const Home = () => {
                 <p className="text-sm text-gray-500">Freelancer</p>
               </div>
             </div>
-            <p><strong>Knows:</strong> UI/UX Design, Figma</p>
-            <p><strong>Wants to Learn:</strong> DSA, Python</p>
+            <p>
+              <strong>Knows:</strong> UI/UX Design, Figma
+            </p>
+            <p>
+              <strong>Wants to Learn:</strong> DSA, Python
+            </p>
             <div className="mt-4 flex gap-3 flex-wrap">
               <button
                 onClick={handleFeatureClick}
@@ -236,10 +248,21 @@ const Home = () => {
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
             <div className="bg-white p-6 rounded-xl shadow-xl w-[90%] max-w-sm text-center">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">Hold on!</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                Hold on!
+              </h3>
+
               <p className="mb-6 text-gray-600">
-                Click on <strong>Join Now</strong> to use the features of this website.
+                Click on{" "}
+                <strong
+                  className="text-blue-600 cursor-pointer"
+                  onClick={goToSignup}
+                >
+                  Join Now
+                </strong>{" "}
+                to use the features of this website.
               </p>
+
               <button
                 onClick={closePopup}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
