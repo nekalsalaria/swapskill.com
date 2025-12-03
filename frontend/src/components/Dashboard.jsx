@@ -261,14 +261,6 @@ const Dashboard = () => {
                             </button>
                           )}
                         </div>
-
-                        {/* Rate Mentor Button - now below and smaller */}
-                        <button
-                          onClick={() => setShowPopup(true)}
-                          className="mt-3 w-2/3 mx-auto block bg-purple-500 hover:bg-purple-600 text-white py-1.5 rounded-md shadow text-sm transition"
-                        >
-                          Rate Mentor
-                        </button>
                       </>
                     )}
                   </div>
