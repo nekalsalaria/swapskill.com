@@ -272,81 +272,81 @@ const Dashboard = () => {
       </main>
 
       {/* Rating Popup */}
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
-            <h3 className="text-lg font-semibold mb-4">Action Required</h3>
-            <p className="text-gray-600 mb-6">
-              First you have to learn something from this mentor. Click on{" "}
-              <strong>Request to Learn</strong> to proceed.
-            </p>
+        {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
+          <h3 className="text-lg font-semibold mb-4">Action Required</h3>
+          <p className="text-gray-600 mb-6">
+            First you have to learn something from this mentor. Click on{" "}
+            <strong>Request to Learn</strong> to proceed.
+          </p>
+          <button
+            onClick={() => setShowPopup(false)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition hover:scale-110"
+          >
+            Okay
+          </button>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Chat Button */}
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-8 right-8 bg-pink-500 hover:bg-red-500 text-white p-4 rounded-full shadow-lg transition hover:scale-125"
+        >
+          <FaComments size={20} />
+        </button>
+
+        {/* Chat Modal */}
+        {isChatOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg w-96 h-[500px] shadow-xl flex flex-col">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h3 className="text-lg font-semibold">Community Chat</h3>
+            <FaTimes
+              className="cursor-pointer text-gray-500 hover:text-gray-700"
+              onClick={() => setIsChatOpen(false)}
+            />
+          </div>
+          <div className="flex-1 p-4 overflow-y-auto space-y-3">
+            {messages.map((msg, idx) => (
+              <div
+            key={idx}
+            className={`p-2 rounded-lg ${
+              msg.user === loggedInUser.name
+                ? "bg-pink-100 text-right"
+                : "bg-gray-100 text-left"
+            }`}
+              >
+            <p className="text-sm font-bold">{msg.user}</p>
+            <p className="text-sm">{msg.message}</p>
+            <span className="text-xs text-gray-400">
+              {new Date(msg.timestamp).toLocaleTimeString()}
+            </span>
+              </div>
+            ))}
+          </div>
+          <div className="p-4 border-t flex gap-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 border p-2 rounded"
+            />
             <button
-              onClick={() => setShowPopup(false)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition"
+              onClick={sendMessage}
+              className="bg-pink-500 hover:bg-red-500 text-white p-2 rounded transition hover:scale-110"
             >
-              Okay
+              <FaPaperPlane />
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsChatOpen(true)}
-        className="fixed bottom-8 right-8 bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-full shadow-lg transition"
-      >
-        <FaComments size={20} />
-      </button>
-
-      {/* Chat Modal */}
-      {isChatOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg w-96 h-[500px] shadow-xl flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">Community Chat</h3>
-              <FaTimes
-                className="cursor-pointer text-gray-500 hover:text-gray-700"
-                onClick={() => setIsChatOpen(false)}
-              />
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-3">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`p-2 rounded-lg ${
-                    msg.user === loggedInUser.name
-                      ? "bg-pink-100 text-right"
-                      : "bg-gray-100 text-left"
-                  }`}
-                >
-                  <p className="text-sm font-bold">{msg.user}</p>
-                  <p className="text-sm">{msg.message}</p>
-                  <span className="text-xs text-gray-400">
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="p-4 border-t flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 border p-2 rounded"
-              />
-              <button
-                onClick={sendMessage}
-                className="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded"
-              >
-                <FaPaperPlane />
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Footer */}
+        {/* Footer */}
       <footer className="w-full bg-gray-900 text-white py-6 px-6 text-sm sm:text-base mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center">
           <div className="mb-4 sm:mb-0 flex items-center gap-2 text-center sm:text-left">
