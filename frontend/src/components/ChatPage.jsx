@@ -13,7 +13,12 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
 
-  // 🔹 Fetch chat messages between current user and toUserId
+  // ⭐ Rating States
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+
+  // 🔹 Fetch chat messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -37,6 +42,7 @@ const ChatPage = () => {
   // 🔹 Handle sending a message
   const handleSend = async () => {
     if (!text.trim()) return;
+
     try {
       await axios.post(
         "https://swapskill-com.onrender.com/api/user/send-message",
@@ -45,13 +51,10 @@ const ChatPage = () => {
           text,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Update message in UI immediately
       setMessages((prev) => [
         ...prev,
         {
@@ -60,6 +63,7 @@ const ChatPage = () => {
           content: text,
         },
       ]);
+
       setText("");
     } catch (err) {
       console.error("Send error", err);
@@ -67,8 +71,73 @@ const ChatPage = () => {
     }
   };
 
+  // ⭐ Submit Rating
+  const submitRating = async () => {
+    try {
+      await axios.post(
+        "https://swapskill-com.onrender.com/api/user/rate-user",
+        {
+          mentorId: toUserId,
+          rating,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert("Rating submitted successfully!");
+      setShowRating(false);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit rating");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-pink-100 to-yellow-100 p-6">
+
+      {/* ⭐ Rating Popup Modal */}
+      {showRating && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
+            <h3 className="text-lg font-bold mb-3">Rate {toUserName}</h3>
+
+            <div className="flex justify-center space-x-2 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  className={`text-3xl cursor-pointer ${
+                    (hover || rating) >= star
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }`}
+                  onMouseEnter={() => setHover(star)}
+                  onMouseLeave={() => setHover(0)}
+                  onClick={() => setRating(star)}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setShowRating(false)}
+                className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRating}
+                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center">
         <button
@@ -77,9 +146,18 @@ const ChatPage = () => {
         >
           ← Back to Profile
         </button>
+
         <div className="text-right">
           <h2 className="text-lg font-bold text-gray-800">{toUserName}</h2>
           <p className="text-sm text-gray-500">{toUserEmail}</p>
+
+          {/* ⭐ Rate Mentor Button */}
+          <button
+            onClick={() => setShowRating(true)}
+            className="mt-2 bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600"
+          >
+            ⭐ Rate This Mentor
+          </button>
         </div>
       </div>
 
@@ -89,6 +167,7 @@ const ChatPage = () => {
           {messages.length === 0 ? (
             <p className="text-gray-400">No messages yet</p>
           ) : (
+
             <ul className="space-y-2">
               {messages.map((msg, index) => (
                 <li
@@ -109,6 +188,7 @@ const ChatPage = () => {
                 </li>
               ))}
             </ul>
+
           )}
         </div>
 

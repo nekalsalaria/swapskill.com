@@ -16,6 +16,25 @@ const requestSchema = new mongoose.Schema({
   },
 });
 
+// ⭐ Rating Schema
+const ratingSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId, // person who gave rating
+    ref: "User",
+    required: true,
+  },
+  stars: {
+    type: Number,
+    min: 1,
+    max: 5,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const messageSchema = new mongoose.Schema({
   from: {
     type: mongoose.Schema.Types.ObjectId,
@@ -46,26 +65,49 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
   email: {
     type: String,
     required: true,
     unique: true,
   },
+
   password: {
     type: String,
     required: true,
   },
+
   canTeach: {
     type: String,
     default: "",
   },
+
   wantToLearn: {
     type: String,
     default: "",
   },
+
   requests: [requestSchema],
   acceptedRequests: [requestSchema],
-  chat: [chatSchema], // ✅ New chat field added
+
+  chat: [chatSchema],
+
+  // ⭐ NEW: ratings array
+  ratings: [ratingSchema],
 });
+
+// ⭐ Compute average & total reviews
+userSchema.methods.getRatingSummary = function () {
+  const totalReviews = this.ratings.length;
+  const avg =
+    totalReviews === 0
+      ? 0
+      : this.ratings.reduce((sum, r) => sum + r.stars, 0) / totalReviews;
+
+  return {
+    averageRating: Number(avg.toFixed(1)),
+    totalReviews,
+  };
+};
 
 module.exports = mongoose.model("User", userSchema);
