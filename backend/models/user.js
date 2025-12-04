@@ -6,20 +6,14 @@ const requestSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  skill: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String, // "learn" or "teach"
-    required: true,
-  },
+  skill: { type: String, required: true },
+  type: { type: String, required: true },
 });
 
 // ⭐ Rating Schema
 const ratingSchema = new mongoose.Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId, // person who gave rating
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
@@ -29,80 +23,50 @@ const ratingSchema = new mongoose.Schema({
     max: 5,
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const messageSchema = new mongoose.Schema({
-  from: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  text: {
-    type: String,
-    required: true,
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
+  from: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  text: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
 });
 
 const chatSchema = new mongoose.Schema({
-  with: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  with: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   messages: [messageSchema],
 });
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
+  name: { type: String, required: true },
 
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  email: { type: String, required: true, unique: true },
 
-  password: {
-    type: String,
-    required: true,
-  },
+  password: { type: String, required: true },
 
-  canTeach: {
-    type: String,
-    default: "",
-  },
+  canTeach: { type: String, default: "" },
 
-  wantToLearn: {
-    type: String,
-    default: "",
-  },
+  wantToLearn: { type: String, default: "" },
 
   requests: [requestSchema],
+
   acceptedRequests: [requestSchema],
 
   chat: [chatSchema],
 
-  // ⭐ NEW: ratings array
+  // ⭐ NEW FIELD
   ratings: [ratingSchema],
 });
 
-// ⭐ Compute average & total reviews
+// ⭐ Rating summary method
 userSchema.methods.getRatingSummary = function () {
   const totalReviews = this.ratings.length;
+  if (totalReviews === 0) {
+    return { averageRating: 0, totalReviews: 0 };
+  }
+
   const avg =
-    totalReviews === 0
-      ? 0
-      : this.ratings.reduce((sum, r) => sum + r.stars, 0) / totalReviews;
+    this.ratings.reduce((sum, r) => sum + r.stars, 0) / totalReviews;
 
   return {
     averageRating: Number(avg.toFixed(1)),
