@@ -58,7 +58,9 @@ const Dashboard = () => {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get("https://swapskill-com.onrender.com/api/discussion");
+      const res = await axios.get(
+        "https://swapskill-com.onrender.com/api/discussion"
+      );
       setMessages(res.data);
     } catch (error) {
       console.error("Failed to fetch messages", error);
@@ -68,10 +70,13 @@ const Dashboard = () => {
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
     try {
-      const res = await axios.post("https://swapskill-com.onrender.com/api/discussion", {
-        user: loggedInUser.name,
-        message: newMessage,
-      });
+      const res = await axios.post(
+        "https://swapskill-com.onrender.com/api/discussion",
+        {
+          user: loggedInUser.name,
+          message: newMessage,
+        }
+      );
       setMessages((prev) => [...prev, res.data]);
       setNewMessage("");
     } catch (error) {
@@ -175,96 +180,129 @@ const Dashboard = () => {
                   ❌ No matching users found.
                 </p>
               ) : (
-                filteredUsers.map((user, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-lg transition transform hover:scale-[1.02]"
-                  >
-                    <div className="flex items-center gap-4 mb-4">
-                      <img
-                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
-                        alt={user.name}
-                        className="w-14 h-14 rounded-full border-2 border-pink-500 object-cover"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {user.name}
-                        </h3>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
+                filteredUsers.map((user, idx) => {
+                  // ⭐ SAFE RATING CALCULATION (NO CRASH)
+                  const ratings = Array.isArray(user.ratings)
+                    ? user.ratings
+                    : [];
 
-                    <p className="text-sm">
-                      <strong>Knows:</strong> {user.canTeach || "Not specified"}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Wants to Learn:</strong>{" "}
-                      {user.wantToLearn || "Not specified"}
-                    </p>
+                  const totalReviews = ratings.length;
 
-                    {/* Rating UI */}
-                    <div className="flex items-center gap-1 mt-3">
-                      {[...Array(5)].map((_, index) => (
-                        <FaRegStar key={index} className="text-yellow-400" />
-                      ))}
-                      <span className="text-sm text-gray-500 ml-2">
-                        (0 reviews)
-                      </span>
-                    </div>
+                  let avgRating = 0;
 
-                    {user._id !== loggedInUser._id && (
-                      <>
-                        <div className="mt-4 flex justify-between gap-3">
-                          {/* Request to Learn Button */}
-                          {user.requests?.some(
-                            (r) =>
-                              r.from === loggedInUser._id && r.type === "learn"
-                          ) ? (
-                            <button className="bg-gray-400 text-white w-1/2 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
-                              Pending...
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() =>
-                                sendRequest(
-                                  user._id,
-                                  user.canTeach || "Skill",
-                                  "learn"
-                                )
-                              }
-                              className="bg-blue-600 hover:bg-blue-700 text-white w-1/2 py-2 rounded-lg text-sm shadow-md transition"
-                            >
-                              Request to Learn
-                            </button>
-                          )}
+                  if (totalReviews > 0) {
+                    const sum = ratings.reduce(
+                      (acc, r) => acc + (r.stars || 0),
+                      0
+                    );
+                    avgRating = Number((sum / totalReviews).toFixed(1));
+                  }
 
-                          {/* Offer to Teach Button */}
-                          {user.requests?.some(
-                            (r) =>
-                              r.from === loggedInUser._id && r.type === "teach"
-                          ) ? (
-                            <button className="bg-gray-400 text-white w-1/2 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
-                              Pending...
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() =>
-                                sendRequest(
-                                  user._id,
-                                  user.wantToLearn || "Skill",
-                                  "teach"
-                                )
-                              }
-                              className="bg-green-600 hover:bg-green-700 text-white w-1/2 py-2 rounded-lg text-sm shadow-md transition"
-                            >
-                              Offer to Teach
-                            </button>
-                          )}
+                  const fullStars = Number.isFinite(avgRating)
+                    ? Math.floor(avgRating)
+                    : 0;
+                  const emptyStars = 5 - fullStars;
+
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-lg transition transform hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center gap-4 mb-4">
+                        <img
+                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                          alt={user.name}
+                          className="w-14 h-14 rounded-full border-2 border-pink-500 object-cover"
+                        />
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            {user.name}
+                          </h3>
+                          <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
-                      </>
-                    )}
-                  </div>
-                ))
+                      </div>
+
+                      <p className="text-sm">
+                        <strong>Knows:</strong>{" "}
+                        {user.canTeach || "Not specified"}
+                      </p>
+                      <p className="text-sm">
+                        <strong>Wants to Learn:</strong>{" "}
+                        {user.wantToLearn || "Not specified"}
+                      </p>
+
+                      {/* ⭐ RATING UI */}
+                      <div className="flex items-center gap-1 mt-3">
+                        {[...Array(fullStars)].map((_, i) => (
+                          <FaRegStar key={i} className="text-yellow-500" />
+                        ))}
+
+                        {[...Array(emptyStars)].map((_, i) => (
+                          <FaRegStar
+                            key={i + fullStars}
+                            className="text-gray-300"
+                          />
+                        ))}
+
+                        <span className="text-sm text-gray-600 ml-2">
+                          ⭐ {avgRating} ({totalReviews} reviews)
+                        </span>
+                      </div>
+
+                      {user._id !== loggedInUser._id && (
+                        <>
+                          <div className="mt-4 flex justify-between gap-3">
+                            {user.requests?.some(
+                              (r) =>
+                                r.from === loggedInUser._id &&
+                                r.type === "learn"
+                            ) ? (
+                              <button className="bg-gray-400 text-white w-1/2 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
+                                Pending...
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  sendRequest(
+                                    user._id,
+                                    user.canTeach || "Skill",
+                                    "learn"
+                                  )
+                                }
+                                className="bg-blue-600 hover:bg-blue-700 text-white w-1/2 py-2 rounded-lg text-sm shadow-md transition"
+                              >
+                                Request to Learn
+                              </button>
+                            )}
+
+                            {user.requests?.some(
+                              (r) =>
+                                r.from === loggedInUser._id &&
+                                r.type === "teach"
+                            ) ? (
+                              <button className="bg-gray-400 text-white w-1/2 py-2 rounded-lg text-sm shadow-md cursor-not-allowed">
+                                Pending...
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  sendRequest(
+                                    user._id,
+                                    user.wantToLearn || "Skill",
+                                    "teach"
+                                  )
+                                }
+                                className="bg-green-600 hover:bg-green-700 text-white w-1/2 py-2 rounded-lg text-sm shadow-md transition"
+                              >
+                                Offer to Teach
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           )}
@@ -272,81 +310,81 @@ const Dashboard = () => {
       </main>
 
       {/* Rating Popup */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
-          <h3 className="text-lg font-semibold mb-4">Action Required</h3>
-          <p className="text-gray-600 mb-6">
-            First you have to learn something from this mentor. Click on{" "}
-            <strong>Request to Learn</strong> to proceed.
-          </p>
-          <button
-            onClick={() => setShowPopup(false)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition hover:scale-110"
-          >
-            Okay
-          </button>
-            </div>
-          </div>
-        )}
-
-        {/* Floating Chat Button */}
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-8 right-8 bg-pink-500 hover:bg-red-500 text-white p-4 rounded-full shadow-lg transition hover:scale-125"
-        >
-          <FaComments size={20} />
-        </button>
-
-        {/* Chat Modal */}
-        {isChatOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg w-96 h-[500px] shadow-xl flex flex-col">
-          <div className="flex justify-between items-center p-4 border-b">
-            <h3 className="text-lg font-semibold">Community Chat</h3>
-            <FaTimes
-              className="cursor-pointer text-gray-500 hover:text-gray-700"
-              onClick={() => setIsChatOpen(false)}
-            />
-          </div>
-          <div className="flex-1 p-4 overflow-y-auto space-y-3">
-            {messages.map((msg, idx) => (
-              <div
-            key={idx}
-            className={`p-2 rounded-lg ${
-              msg.user === loggedInUser.name
-                ? "bg-pink-100 text-right"
-                : "bg-gray-100 text-left"
-            }`}
-              >
-            <p className="text-sm font-bold">{msg.user}</p>
-            <p className="text-sm">{msg.message}</p>
-            <span className="text-xs text-gray-400">
-              {new Date(msg.timestamp).toLocaleTimeString()}
-            </span>
-              </div>
-            ))}
-          </div>
-          <div className="p-4 border-t flex gap-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 border p-2 rounded"
-            />
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-96 text-center">
+            <h3 className="text-lg font-semibold mb-4">Action Required</h3>
+            <p className="text-gray-600 mb-6">
+              First you have to learn something from this mentor. Click on{" "}
+              <strong>Request to Learn</strong> to proceed.
+            </p>
             <button
-              onClick={sendMessage}
-              className="bg-pink-500 hover:bg-red-500 text-white p-2 rounded transition hover:scale-110"
+              onClick={() => setShowPopup(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition hover:scale-110"
             >
-              <FaPaperPlane />
+              Okay
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Floating Chat Button */}
+      <button
+        onClick={() => setIsChatOpen(true)}
+        className="fixed bottom-8 right-8 bg-pink-500 hover:bg-red-500 text-white p-4 rounded-full shadow-lg transition hover:scale-125"
+      >
+        <FaComments size={20} />
+      </button>
+
+      {/* Chat Modal */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg w-96 h-[500px] shadow-xl flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold">Community Chat</h3>
+              <FaTimes
+                className="cursor-pointer text-gray-500 hover:text-gray-700"
+                onClick={() => setIsChatOpen(false)}
+              />
+            </div>
+            <div className="flex-1 p-4 overflow-y-auto space-y-3">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`p-2 rounded-lg ${
+                    msg.user === loggedInUser.name
+                      ? "bg-pink-100 text-right"
+                      : "bg-gray-100 text-left"
+                  }`}
+                >
+                  <p className="text-sm font-bold">{msg.user}</p>
+                  <p className="text-sm">{msg.message}</p>
+                  <span className="text-xs text-gray-400">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 border p-2 rounded"
+              />
+              <button
+                onClick={sendMessage}
+                className="bg-pink-500 hover:bg-red-500 text-white p-2 rounded transition hover:scale-110"
+              >
+                <FaPaperPlane />
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Footer */}
+      {/* Footer */}
       <footer className="w-full bg-gray-900 text-white py-6 px-6 text-sm sm:text-base mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center">
           <div className="mb-4 sm:mb-0 flex items-center gap-2 text-center sm:text-left">
