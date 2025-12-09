@@ -167,9 +167,15 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="flex-grow">
         <section className="px-4 sm:px-6 py-10">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
-            Connect with Learners & Mentors
-          </h2>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Connect with Learners & Mentors
+            </h2>
+
+            <p className="mt-2 text-sm font-semibold text-green-600">
+              🟢 Live Learners: 103
+            </p>
+          </div>
 
           {loading ? (
             <p className="text-center text-gray-600">Loading users...</p>
