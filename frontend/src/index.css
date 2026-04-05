@@ -92,7 +92,12 @@ body {
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--border);
 }
-
+/* Mobile pe hide kar de */
+@media (max-width: 768px) {
+  .nav-link {
+    display: none;
+  }
+}
 /* ── Buttons ── */
 .btn-primary {
   background: var(--accent);

@@ -6,7 +6,7 @@ import {
   FaCheck, FaTimesCircle, FaUser, FaHome,
   FaCheckCircle, FaArrowRight, FaUsers, FaCopy, FaPlay, FaDoorOpen,
 } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import profileImg from "../assets/profile.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, addNotification, markNotificationsRead, clearNotifications } from "../redux/userSlice";
@@ -97,7 +97,7 @@ const OnboardingBanner = ({ user, connections, navigate }) => {
 };
 
 /* ─── Notification dropdown ───────────────────────────── */
-const NotifDropdown = ({ notifs, onRead, onClear, onClose }) => (
+const NotifDropdown = ({ notifs, onRead, onClear }) => (
   <div style={{
     position: "absolute", top: "calc(100% + 10px)", right: 0,
     width: 300, background: "var(--bg-card)", border: "1px solid var(--border)",
@@ -281,7 +281,9 @@ const Dashboard = () => {
         });
       }
       setPrevPending(pending);
-    } catch {}
+    } catch (err) {
+      console.error("Failed to fetch requests:", err);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
@@ -301,7 +303,7 @@ const Dashboard = () => {
 
   const fetchCommunityMsgs = async () => {
     try { const res = await axios.get(`${API}/api/discussion`); setMessages(res.data); }
-    catch {}
+    catch (err) { console.error("Failed to load community messages:", err); }
   };
 
   const sendCommunityMsg = async () => {
@@ -310,7 +312,10 @@ const Dashboard = () => {
       const res = await axios.post(`${API}/api/discussion`, { user: loggedInUser.name, message: newMessage });
       setMessages(p => [...p, res.data]);
       setNewMessage("");
-    } catch {}
+    } catch (err) {
+      console.error("Failed to send community message:", err);
+      toast.error("Unable to send message. Try again.");
+    }
   };
 
   // ── search ──
@@ -364,7 +369,10 @@ const Dashboard = () => {
     try {
       await axios.post(`${API}/api/user/delete-accepted`, { requestId: id }, { headers: { Authorization: `Bearer ${token}` } });
       setAcceptedReqs(p => p.filter(r => r._id !== id));
-    } catch {}
+    } catch (err) {
+      console.error("Failed to remove accepted request:", err);
+      toast.error("Unable to remove connection.");
+    }
   };
 
   // ── open 1-to-1 chat session ──
