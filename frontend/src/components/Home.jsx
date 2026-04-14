@@ -429,246 +429,263 @@ const Home = () => {
 
       {/* ── Explore ── */}
       <section
-        ref={exploreRef}
-        style={{ maxWidth: 960, margin: "0 auto", padding: "20px 32px 80px" }}
+  ref={exploreRef}
+  style={{
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: "40px 32px 100px",
+  }}
+>
+  {/* Heading */}
+  <div style={{ marginBottom: 48, textAlign: "center" }}>
+    {/* <p
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: "var(--accent)",
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        marginBottom: 12,
+      }}
+    >
+      Explore
+    </p> */}
+
+    <h2
+      style={{
+        fontSize: "clamp(2rem, 4vw, 2.8rem)",
+        fontWeight: 800,
+        letterSpacing: "-0.03em",
+        marginBottom: 10,
+      }}
+    >
+      Find your perfect skill partner
+    </h2>
+
+    <p
+      style={{
+        fontSize: 15,
+        color: "var(--text-secondary)",
+        maxWidth: 500,
+        margin: "0 auto",
+        lineHeight: 1.6,
+      }}
+    >
+      Learn faster by connecting with real people who share your goals.
+    </p>
+  </div>
+
+  {/* Cards */}
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      gap: 24,
+    }}
+  >
+    {[
+      {
+        name: "Ravi Mehra",
+        role: "Student",
+        seed: "Ravi",
+        teaches: "Data Structures, Java",
+        learns: "UI/UX, JavaScript",
+      },
+      {
+        name: "Neha Sharma",
+        role: "Freelancer",
+        seed: "Neha",
+        teaches: "UI/UX, Figma",
+        learns: "DSA, Python",
+      },
+      {
+        name: "Arjun Nair",
+        role: "Developer",
+        seed: "Arjun",
+        teaches: "React, Node.js",
+        learns: "ML, Python",
+      },
+    ].map(({ name, role, seed, teaches, learns }) => (
+      <div
+        key={name}
+        className="ss-card"
+        style={{
+          padding: 26,
+          borderRadius: 20,
+          background: "#fff",
+          border: "1px solid rgba(0,0,0,0.04)",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+          transition: "all 0.3s ease",
+          position: "relative",
+          overflow: "hidden",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-6px)";
+          e.currentTarget.style.boxShadow =
+            "0 20px 50px rgba(0,0,0,0.12)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow =
+            "0 10px 30px rgba(0,0,0,0.06)";
+        }}
       >
-        <div style={{ marginBottom: 36 }}>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: "var(--accent)",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              margin: "0 0 10px",
-            }}
-          >
-            Explore
-          </p>
-          <h2
-            style={{
-              fontSize: "clamp(1.7rem, 3vw, 2.3rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              margin: "0 0 8px",
-            }}
-          >
-            Find your skill partner
-          </h2>
-          <p
-            style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0 }}
-          >
-            Browse learners and mentors. Start exchanging today.
-          </p>
-        </div>
-
+        {/* Gradient top line */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))",
-            gap: 12,
-            marginBottom: 48,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background:
+              "linear-gradient(90deg, #e91e8c, #6366f1, #06b6d4)",
           }}
-        >
-          {[
-            {
-              name: "Ravi Mehra",
-              role: "Student",
-              seed: "Ravi",
-              teaches: "Data Structures, Java",
-              learns: "UI/UX, JavaScript",
-            },
-            {
-              name: "Neha Sharma",
-              role: "Freelancer",
-              seed: "Neha",
-              teaches: "UI/UX, Figma",
-              learns: "DSA, Python",
-            },
-            {
-              name: "Arjun Nair",
-              role: "Developer",
-              seed: "Arjun",
-              teaches: "React, Node.js",
-              learns: "ML, Python",
-            },
-          ].map(({ name, role, seed, teaches, learns }) => (
-            <div key={name} className="ss-card" style={{ padding: "20px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 11,
-                  marginBottom: 16,
-                }}
-              >
-                <img
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=e91e8c&fontColor=ffffff`}
-                  alt={name}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "50%",
-                    border: "2px solid var(--accent-border)",
-                  }}
-                />
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: 14, margin: 0 }}>
-                    {name}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: "var(--text-muted)",
-                      margin: 0,
-                    }}
-                  >
-                    {role}
-                  </p>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 7,
-                  marginBottom: 16,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <span className="ss-tag ss-tag-green">Teaches</span>
-                  <span
-                    style={{ fontSize: 12, color: "var(--text-secondary)" }}
-                  >
-                    {teaches}
-                  </span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <span className="ss-tag ss-tag-blue">Learns</span>
-                  <span
-                    style={{ fontSize: 12, color: "var(--text-secondary)" }}
-                  >
-                    {learns}
-                  </span>
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 7 }}>
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="btn-primary"
-                  style={{ flex: 1, padding: "8px 0", fontSize: 12 }}
-                >
-                  Learn
-                </button>
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="btn-green"
-                  style={{ flex: 1, padding: "8px 0", fontSize: 12 }}
-                >
-                  Teach
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        />
 
-        {/* CTA block */}
+        {/* Header */}
         <div
           style={{
-            textAlign: "center",
-            padding: "52px 32px",
-            border: "1px solid var(--border)",
-            borderRadius: 18,
-            background: "#fff",
-            position: "relative",
-            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            marginBottom: 18,
           }}
         >
-          <div
+          <img
+            src={`https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=e91e8c&fontColor=ffffff`}
+            alt={name}
             style={{
-              position: "absolute",
-              top: -60,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 500,
-              height: 300,
+              width: 54,
+              height: 54,
               borderRadius: "50%",
-              background:
-                "radial-gradient(ellipse, rgba(233,30,140,0.06) 0%, transparent 70%)",
-              pointerEvents: "none",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
             }}
           />
+
+          <div>
+            <p
+              style={{
+                fontWeight: 700,
+                fontSize: 16,
+                margin: 0,
+              }}
+            >
+              {name}
+            </p>
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--text-muted)",
+                marginTop: 2,
+              }}
+            >
+              {role}
+            </p>
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div
+          style={{
+            marginBottom: 20,
+            background: "#f9fafb",
+            padding: 14,
+            borderRadius: 12,
+          }}
+        >
           <p
             style={{
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 700,
-              color: "var(--accent)",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              margin: "0 0 12px",
+              color: "#999",
+              marginBottom: 6,
+              letterSpacing: "0.06em",
             }}
           >
-            Ready to start?
+            CAN TEACH
           </p>
-          <h3
-            style={{
-              fontSize: 26,
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              margin: "0 0 8px",
-            }}
-          >
-            Join SwapSkill today
-          </h3>
-          <p
-            style={{
-              fontSize: 14,
-              color: "var(--text-secondary)",
-              margin: "0 0 24px",
-            }}
-          >
-            Free forever. No credit card required.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              justifyContent: "center",
-              marginBottom: 28,
-              flexWrap: "wrap",
-            }}
-          >
-            {["No fees ever", "Any skill", "Any level"].map((t) => (
-              <div
-                key={t}
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {teaches.split(", ").map((skill) => (
+              <span
+                key={skill}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: 13,
-                  color: "var(--text-secondary)",
+                  fontSize: 11,
+                  padding: "5px 10px",
+                  borderRadius: 999,
+                  background: "rgba(233,30,140,0.1)",
+                  color: "#e91e8c",
+                  fontWeight: 600,
                 }}
               >
-                <FaCheck style={{ color: "var(--green)", fontSize: 11 }} /> {t}
-              </div>
+                {skill}
+              </span>
             ))}
           </div>
-          <button
-            onClick={() => navigate("/signup")}
-            className="btn-primary"
+
+          <p
             style={{
-              padding: "13px 32px",
-              fontSize: 15,
-              borderRadius: 10,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#999",
+              marginTop: 12,
+              marginBottom: 6,
+              letterSpacing: "0.06em",
             }}
           >
-            Get started free <FaArrowRight size={13} />
+            WANTS TO LEARN
+          </p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {learns.split(", ").map((skill) => (
+              <span
+                key={skill}
+                style={{
+                  fontSize: 11,
+                  padding: "5px 10px",
+                  borderRadius: 999,
+                  background: "rgba(99,102,241,0.1)",
+                  color: "#6366f1",
+                  fontWeight: 600,
+                }}
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            onClick={() => setShowPopup(true)}
+            className="btn-primary"
+            style={{
+              padding: "11px 0",
+              fontSize: 13,
+              borderRadius: 10,
+            }}
+          >
+            Learn from {name}
+          </button>
+
+          <button
+            onClick={() => setShowPopup(true)}
+            className="btn-outline"
+            style={{
+              padding: "11px 0",
+              fontSize: 13,
+              borderRadius: 10,
+            }}
+          >
+            Teach {name}
           </button>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
 
       {/* Popup */}
       {showPopup && (

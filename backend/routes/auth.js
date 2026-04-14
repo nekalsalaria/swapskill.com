@@ -5,21 +5,77 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const verifyToken = require("../middleware/verifyToken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const Filter = require("bad-words");
 
 // ✅ SIGNUP
 router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
+
   try {
+    // -------------------------------
+    // 1. Required fields
+    // -------------------------------
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const cleanName = name.trim();
+
+    // -------------------------------
+    // 2. Name validation
+    // -------------------------------
+    if (cleanName.length < 3 || cleanName.length > 30) {
+      return res.status(400).json({
+        error: "Name must be between 3 and 30 characters",
+      });
+    }
+
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(cleanName)) {
+      return res.status(400).json({
+        error: "Name can only contain letters and spaces",
+      });
+    }
+
+    // profanity check
+    if (filter.isProfane(cleanName)) {
+      return res.status(400).json({
+        error: "Inappropriate name not allowed",
+      });
+    }
+
+    // -------------------------------
+    // 3. Password validation
+    // -------------------------------
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        error:
+          "Password must be at least 8 characters and include uppercase, lowercase, number, and special character",
+      });
+    }
+
+    // -------------------------------
+    // 4. Check existing user
+    // -------------------------------
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: "User already exists" });
     }
 
+    // -------------------------------
+    // 5. Hash password
+    // -------------------------------
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // -------------------------------
+    // 6. Create user
+    // -------------------------------
     const newUser = await User.create({
-      name,
+      name: cleanName,
       email,
       password: hashedPassword,
     });
@@ -99,10 +155,14 @@ router.put("/update", verifyToken, async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, canTeach, wantToLearn, pricePerHour: Number(pricePerHour) || 0 },
+      {
+        name,
+        canTeach: clean(canTeach),        // ✅ FIX
+        wantToLearn: clean(wantToLearn),  // ✅ FIX
+        pricePerHour: Number(pricePerHour) || 0
+      },
       { new: true }
     );
-
     res.status(200).json({
       user: {
         _id: updatedUser._id,
