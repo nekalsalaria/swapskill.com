@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema({
   canTeach: { type: String, default: "" },
 
   wantToLearn: { type: String, default: "" },
+  about: { type: String, default: "" },
+  linkedin: { type: String, default: "" },
+  github: { type: String, default: "" },
+  website: { type: String, default: "" },
 
   pricePerHour: { type: Number, default: 0 }, // 0 = free/swap only
 

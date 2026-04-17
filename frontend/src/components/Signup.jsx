@@ -88,8 +88,8 @@ const Signup = () => {
 
     try {
       const res = await axios.post(
-        "https://swapskill-com.onrender.com/api/auth/signup",
-        form
+      "http://localhost:5000/api/auth/signup", form
+      
       );
       dispatch(setToken(res.data.token));
       dispatch(setUserData(res.data.user));

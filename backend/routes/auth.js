@@ -4,14 +4,31 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const verifyToken = require("../middleware/verifyToken");
-const JWT_SECRET = process.env.JWT_SECRET;
+
+// ✅ FIXED IMPORT (important)
 const Filter = require("bad-words");
+const filter = new Filter();
+
+// ✅ custom words
+filter.addWords("lodu", "lund", "fudu", "gandu", "bc", "mc");
+
+// ✅ clean helper
+const clean = (str) =>
+  (str || "")
+    .split(/[,\n]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(", ");
 
 // ✅ SIGNUP
 router.post("/signup", async (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
+    const { name, email, password } = req.body;
+
+    // DEBUG (remove later)
+    console.log("Signup hit");
+    console.log("Filter exists:", typeof filter);
+
     // -------------------------------
     // 1. Required fields
     // -------------------------------
@@ -37,8 +54,8 @@ router.post("/signup", async (req, res) => {
       });
     }
 
-    // profanity check
-    if (filter.isProfane(cleanName)) {
+    // ✅ SAFE PROFANITY CHECK
+    if (filter && filter.isProfane && filter.isProfane(cleanName)) {
       return res.status(400).json({
         error: "Inappropriate name not allowed",
       });
@@ -89,6 +106,7 @@ router.post("/signup", async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("Signup Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -146,36 +164,42 @@ router.post("/login", async (req, res) => {
 // ✅ UPDATE PROFILE
 router.put("/update", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.userId;
-    const { name, canTeach, wantToLearn, pricePerHour } = req.body;
+    console.log("USER:", req.user);
+    console.log("BODY:", req.body);
 
-    if (!userId || !name) {
-      return res.status(400).json({ error: "Missing required fields" });
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "No userId" });
+    }
+
+    if (!req.body.name) {
+      return res.status(400).json({ error: "Name required" });
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        name,
-        canTeach: clean(canTeach),        // ✅ FIX
-        wantToLearn: clean(wantToLearn),  // ✅ FIX
-        pricePerHour: Number(pricePerHour) || 0
+        name: req.body.name.trim(),
+        canTeach: req.body.canTeach || "",
+        wantToLearn: req.body.wantToLearn || "",
+        pricePerHour: Number(req.body.pricePerHour) || 0,
+        about: req.body.about || "",
+        linkedin: req.body.linkedin || "",
+        github: req.body.github || "",
+        website: req.body.website || "",
       },
-      { new: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
-    res.status(200).json({
-      user: {
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        canTeach: updatedUser.canTeach,
-        wantToLearn: updatedUser.wantToLearn,
-        pricePerHour: updatedUser.pricePerHour || 0,
-      },
-    });
+
+    res.json({ user: updatedUser });
+
   } catch (err) {
-    console.error("Update Error:", err.message);
-    res.status(500).json({ error: "Server error" });
+    console.error("🔥 ERROR:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
