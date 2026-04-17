@@ -150,12 +150,6 @@ const EditProfile = () => {
   const [website, setWebsite] = useState("");
   const [pricePerHour, setPricePerHour] = useState("");
   const [editing, setEditing] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [stats, setStats] = useState({
-    connections: 0,
-    avgRating: 0,
-    totalRatings: 0,
-  });
 
   // ONLY 2 places updated: useEffect + handleSubmit
 
@@ -496,21 +490,7 @@ const EditProfile = () => {
             gap: 12,
             marginBottom: 24,
           }}
-        >
-          <StatCard
-            icon={<FaUserFriends />}
-            value={stats.connections}
-            label="Connections"
-            color="var(--accent)"
-          />
-
-          <StatCard
-            icon={<FaStar />}
-            value={stats.avgRating || "—"}
-            label={`Rating · ${stats.totalRatings} reviews`}
-            color="var(--amber)"
-          />
-        </div>
+        ></div>
 
         {/* ── TWO COLUMN ── */}
         <div
@@ -740,61 +720,78 @@ const EditProfile = () => {
               className="ss-card"
               style={{ padding: "20px 22px", borderRadius: 16 }}
             >
-              <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>
+              <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>
                 Social Links
               </p>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  marginBottom: 16,
-                }}
-              >
-                Coming soon — link your profiles
-              </p>
+
               <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
               >
                 {[
                   {
                     icon: <FaLinkedin style={{ color: "#0077b5" }} />,
                     label: "LinkedIn",
-                    placeholder: "linkedin.com/in/yourname",
                     value: linkedin,
                     set: setLinkedin,
+                    placeholder: "https://linkedin.com/in/yourname",
                   },
                   {
                     icon: <FaGithub style={{ color: "var(--text-primary)" }} />,
                     label: "GitHub",
-                    placeholder: "github.com/yourname",
                     value: github,
                     set: setGithub,
+                    placeholder: "https://github.com/yourname",
                   },
                   {
                     icon: <FaGlobe style={{ color: "var(--accent)" }} />,
                     label: "Website",
-                    placeholder: "yourwebsite.com",
                     value: website,
                     set: setWebsite,
+                    placeholder: "https://yourwebsite.com",
                   },
-                ].map(({ icon, label, placeholder }) => (
+                ].map(({ icon, label, value, set, placeholder }) => (
                   <div
                     key={label}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: 10,
-                      padding: "9px 12px",
-                      background: "var(--bg-surface)",
-                      borderRadius: 10,
-                      border: "1px solid var(--border)",
-                      opacity: 0.7,
                     }}
                   >
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
-                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                      {placeholder}
-                    </span>
+                    <span style={{ fontSize: 16 }}>{icon}</span>
+
+                    {editing ? (
+                      <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                        placeholder={placeholder}
+                        className="ss-input"
+                        style={{ flex: 1 }}
+                      />
+                    ) : value ? (
+                      <a
+                        href={
+                          value.startsWith("http") ? value : `https://${value}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          fontSize: 13,
+                          color: "var(--accent)",
+                          textDecoration: "none",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {value}
+                      </a>
+                    ) : (
+                      <span
+                        style={{ fontSize: 12, color: "var(--text-muted)" }}
+                      >
+                        Not added
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
