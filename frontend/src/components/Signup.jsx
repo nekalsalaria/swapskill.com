@@ -88,8 +88,9 @@ const Signup = () => {
 
     try {
       const res = await axios.post(
-      "http://localhost:5000/api/auth/signup", form
-      
+        "https://swapskill-com.onrender.com/api/auth/signup",
+        form,
+        //  "http://localhost:5000/api/auth/signup"
       );
       dispatch(setToken(res.data.token));
       dispatch(setUserData(res.data.user));
@@ -139,9 +140,7 @@ const Signup = () => {
               marginBottom: 8,
             }}
           >
-            <FaExchangeAlt
-              style={{ color: "var(--accent)", fontSize: 18 }}
-            />
+            <FaExchangeAlt style={{ color: "var(--accent)", fontSize: 18 }} />
             <span
               className="grad-text"
               style={{
@@ -264,8 +263,7 @@ const Signup = () => {
                       color: getPasswordStrength(form.password).color,
                     }}
                   >
-                    Strength:{" "}
-                    {getPasswordStrength(form.password).text}
+                    Strength: {getPasswordStrength(form.password).text}
                   </p>
                 )}
               </div>
