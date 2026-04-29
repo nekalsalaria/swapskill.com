@@ -43,6 +43,10 @@ app.use(
   })
 );
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
